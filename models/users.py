@@ -9,6 +9,10 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     # password = db.Column(db.String(64))
     # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    
+    def __init__(self, username, email):
+        self.username = username
+        self.email = email
 
     def __repr__(self):
         return '<User %r>' % self.username

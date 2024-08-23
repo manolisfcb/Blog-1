@@ -55,7 +55,12 @@ def name():
 @app.route('/user/add', methods=['GET', 'POST'])
 def add_user():
     form = UserForm()
+    name = None
     if form.validate_on_submit():
+        if User.query.filter_by(username=form.name.data).first():
+            flash('User already exists')
+            return render_template('add_user.html', form=form)
+        
         name = form.name.data
         email = form.email.data
         user = User(username=name, email = email)
