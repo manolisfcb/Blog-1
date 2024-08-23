@@ -1,16 +1,8 @@
 from flask import Flask, render_template, flash
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
-
+from forms import *
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_migrate import Migrate
-# Create db instance
-db = SQLAlchemy()
-
-
-
 
 
 app = Flask(__name__)
@@ -18,12 +10,22 @@ app = Flask(__name__)
 
 # Create a secret key for CSRF protection
 app.config['SECRET_KEY'] = 'secret'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.sqlite'
+
+# Create db instance
+db = SQLAlchemy(app)
+
+# Create Migrate instance
+migrate = Migrate(app, db)
 
 
-# Create a form class
-class NameForm(FlaskForm):
-    name = StringField('What is your name?', validators=[DataRequired()])
-    submit = SubmitField('Submit')
+
+from models.users import User 
+
+# create all tables before running the app
+
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
@@ -49,6 +51,19 @@ def name():
                 
     return render_template('name.html', name=name, form=form)
 
+
+@app.route('/user/add', methods=['GET', 'POST'])
+def add_user():
+    form = UserForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        user = User(username=name, email = email)
+        db.session.add(user)
+        db.session.commit()
+        flash('User added successfully')
+        form.name.data = ''
+    return render_template('add_user.html', form=form)
 
 
 
