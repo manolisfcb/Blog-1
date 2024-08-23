@@ -15,7 +15,6 @@
         <p>Hello users</p>
 
     {% else %}
-        <p>Here is a list of users:</p>
         <br>
             <form method="post" class="form-control">
                 {{ form.hidden_tag() }}
@@ -31,6 +30,22 @@
 
                 {{ form.submit(class="btn btn-dark mb-3") }}
             </form>
-    
+    <br/><br/><br/>
+    {% endif %}
+    <p>Here is a list of users:</p>
+    {% if users %}
+    <table class="table table-hover table-bordered table-striped">
+
+            {% for user in users %}
+                <tr>
+                    <td>
+                    {{ user.username }} - {{ user.email }} <br/>
+                    </td>
+                </tr>
+            {% endfor %}
+
+    </table>
+    {% else %}
+        <p>No users found</p>
     {% endif %}
 {% endblock %}

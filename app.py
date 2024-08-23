@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, redirect, url_for
 from forms import *
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -57,10 +57,10 @@ def add_user():
     form = UserForm()
     name = None
     if form.validate_on_submit():
-        if User.query.filter_by(username=form.name.data).first():
-            flash('User already exists')
-            return render_template('add_user.html', form=form)
-        
+        if User.query.filter_by(email=form.email.data).first():
+            flash('That user already exists!')
+            print('That user already exists!')
+            return redirect(url_for('add_user'))        
         name = form.name.data
         email = form.email.data
         user = User(username=name, email = email)
@@ -68,7 +68,11 @@ def add_user():
         db.session.commit()
         flash('User added successfully')
         form.name.data = ''
-    return render_template('add_user.html', form=form)
+        form.email.data = ''
+        
+    all_users = User.query.all()
+    return render_template('add_user.html', form=form, users=all_users, name=name)
+    
 
 
 
